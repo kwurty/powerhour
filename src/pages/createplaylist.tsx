@@ -82,22 +82,14 @@ export default function CreatePlaylist() {
     },
   });
 
-  const [requestCurrentVideoTime, setRequestCurrentVideoTime] =
-    useState<boolean>(false);
   const [currentVideoTime, setCurrentVideoTime] = useState<number>(0);
-  const [videoid, setVideoid] = useState<string>("veyTWq5aI8w");
 
   const [playlist, setPlaylist] = useState<Playlist>({
-    name: "",
+    name: "New Playlist",
     videos: [],
     likes: 0,
     plays: 0,
   });
-
-  const changeVideoHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    setVideoid("qvdnTfyv7y8");
-  };
 
   useEffect(() => {
     setPlaylist((playlist) => ({
@@ -106,20 +98,43 @@ export default function CreatePlaylist() {
     }));
   }, [playlistTracks]);
 
+  useEffect(() => {
+    if (playlist.videos.length > 0) {
+      localStorage.setItem("newPlaylist", JSON.stringify(playlist));
+    }
+  }, [playlist]);
+
+  useEffect(() => {
+    // check for existing playlist...
+    if (localStorage.getItem("newPlaylist")) {
+      let storedPlaylist = localStorage.getItem("newPlaylist");
+      if (storedPlaylist) {
+        let plObj = JSON.parse(storedPlaylist);
+        setPlaylist(plObj);
+        setPlaylistTracks(plObj.videos);
+      }
+    }
+  }, []);
+
   return (
-    <div className="flex h-screen">
+    <div className="grid gap-2 mt-2 grid-cols-5 grid-rows-1 w-screen h-full">
       {/* <button onClick={changeVideoHandler}> change video </button> */}
 
-      <div className="w-8/12 h-full">
-        <div className="w-auto h-3/4">
+      <div className="area col-span-2">
+        <PlaylistView
+          playlist={playlist}
+          setPlaylistTracks={setPlaylistTracks}
+        />
+      </div>
+      <div className="col-span-2">
+        <div className="w-full h-full">
           <YoutubePlayer
             videoid={playVideo.id}
             setCurrentVideoTime={setCurrentVideoTime}
           />
         </div>
-        <PlaylistView playlist={playlist} />
       </div>
-      <div className="w-4/12">
+      <div className="w-full col-span-1">
         <YoutubeSearch
           playlistTracks={playlistTracks}
           setPlaylistTracks={setPlaylistTracks}

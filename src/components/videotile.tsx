@@ -1,5 +1,7 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { Video } from "../types/youtubesearch.type";
+import { isoConvert } from "../services/tools";
+import { VideoTime } from "../types/tools.type";
 // import "../types/videotiles.type";
 
 interface Props {
@@ -15,6 +17,12 @@ export default function Videotile({
   setPlaylistTracks,
   playVideo,
 }: Props) {
+  const [videoTime, setVideoTime] = useState<VideoTime>({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
   const addToPlayList = (video: Video) => {
     if (!playlistTracks.includes(video)) {
       setPlaylistTracks([...playlistTracks, video]);
@@ -30,17 +38,55 @@ export default function Videotile({
       });
     }
   };
+
+  useEffect(() => {
+    if (video.contentDetails?.duration) {
+      let hours = isoConvert(video.contentDetails.duration)?.hours;
+      let minutes = isoConvert(video.contentDetails.duration)?.minutes;
+      let seconds = isoConvert(video.contentDetails.duration)?.seconds;
+
+      setVideoTime({
+        hours,
+        minutes,
+        seconds,
+      });
+    }
+  }, []);
+
   return (
-    <div className="flex flex-row">
-      <div id="thumbnail" className="w-28">
-        {" "}
+    <div
+      className="flex flex-row hover:bg-slate-300 cursor-pointer"
+      onClick={(event: React.MouseEvent<HTMLElement>) => {
+        if ((event.target as HTMLInputElement).tagName !== "BUTTON") {
+          console.dir(event.target);
+          playVideo(video);
+        }
+      }}
+    >
+      <div id="thumbnail" className="w-28 relative bg-black">
+        <span className="z-10 bg-black text-white absolute bottom-0 right-0">
+          {video?.contentDetails?.duration && (
+            <div>
+              {(videoTime.hours &&
+                videoTime.hours > 0 &&
+                videoTime.hours.toString().padStart(2, "0") + ":") ||
+                ""}
+              {(videoTime.minutes &&
+                videoTime.minutes > 0 &&
+                videoTime.minutes.toString().padStart(2, "0")) ||
+                "00"}
+              :
+              {(videoTime.seconds &&
+                videoTime.seconds > 0 &&
+                videoTime.seconds.toString().padStart(2, "0")) ||
+                "00"}
+            </div>
+          )}
+        </span>
         <img
           className="w-auto"
           src={video?.snippet?.thumbnails?.default?.url}
           alt="youtube thumbnail"
-          onClick={(event: React.MouseEvent<HTMLElement>) => {
-            playVideo(video);
-          }}
         />
       </div>
       <div id="content" className="text-left w-3/5 pl-4">
@@ -50,7 +96,6 @@ export default function Videotile({
           </h1>
         </div>
         <h3 className="text-sm">{video.snippet.channelTitle}</h3>
-        <h3>{video.contentDetails?.duration}</h3>
         {!playlistTracks.includes(video) && (
           <button
             className="rounded bg-blue-300 border border-slate-700 py-1 px-3 text-blue-700"
@@ -63,7 +108,7 @@ export default function Videotile({
         )}
         {playlistTracks.includes(video) && (
           <button
-            className="rounded bg-blue-300 border border-slate-700 py-1 px-3 text-blue-700"
+            className="rounded bg-blue-300 border border-slate-700 py-1 px-3 z-10 text-blue-700"
             onClick={(event: React.MouseEvent<HTMLElement>) => {
               removeFromPlaylist(video);
             }}

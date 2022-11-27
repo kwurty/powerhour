@@ -61,7 +61,7 @@ export default function YoutubeSearch({
   }, [currentVideoTime]);
 
   return (
-    <div>
+    <div className="h-1/2">
       <form>
         <label htmlFor="searchString">Search: </label>
         <input
@@ -75,7 +75,7 @@ export default function YoutubeSearch({
       </form>
       <div>results</div>
 
-      <div>
+      <div className="container max-h-full overflow-x-hidden overflow-scroll">
         {searchResults.map((video: Video, index) => {
           return (
             <div key={video.id}>
