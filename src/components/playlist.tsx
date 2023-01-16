@@ -40,6 +40,7 @@ export default function PlaylistView({ playlist, setPlaylistTracks }: Props) {
       {playlist.videos.map((video: Video) => {
         return (
           <PlaylistTrack
+            key={playlist.videos.indexOf(video)}
             playlist={playlist}
             setPlaylistTracks={setPlaylistTracks}
             video={video}

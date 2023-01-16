@@ -58,7 +58,6 @@ export default function Videotile({
       className="flex flex-row hover:bg-slate-300 cursor-pointer"
       onClick={(event: React.MouseEvent<HTMLElement>) => {
         if ((event.target as HTMLInputElement).tagName !== "BUTTON") {
-          console.dir(event.target);
           playVideo(video);
         }
       }}
