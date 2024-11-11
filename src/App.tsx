@@ -1,19 +1,20 @@
-import React from "react";
-import "./App.css";
+import React from 'react'
+import './App.css'
 import {
   createBrowserRouter,
   createRoutesFromElements,
   RouterProvider,
   Routes,
   Route,
-  Link,
-} from "react-router-dom";
-import Nav from "./components/nav";
-import Profile from "./pages/proifle";
-import Playlists from "./pages/playlists";
-import CreatePlaylist from "./pages/createplaylist";
-import Login from "./pages/login";
-import RouterContainer from "./pages/routercontainer";
+  Link
+} from 'react-router-dom'
+import Nav from './components/nav'
+import Profile from './pages/proifle'
+import Playlists from './pages/playlists'
+import CreatePlaylist from './pages/createplaylist'
+import Login from './pages/login'
+import RouterContainer from './pages/routercontainer'
+import { UserProvider } from './services/user'
 
 function App() {
   const router = createBrowserRouter(
@@ -25,13 +26,15 @@ function App() {
         <Route path="/login" element={<Login />} />
       </Route>
     )
-  );
+  )
 
   return (
-    <div className="App h-screen">
-      <RouterProvider router={router} />
-    </div>
-  );
+    <UserProvider>
+      <div className="App">
+        <RouterProvider router={router} />
+      </div>
+    </UserProvider>
+  )
 }
 
-export default App;
+export default App

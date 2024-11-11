@@ -1,75 +1,69 @@
-import React, { useState, Dispatch, SetStateAction, useEffect } from "react";
-import { Playlist } from "../types/playlist.type";
-import { Video } from "../types/youtubesearch.type";
+import React, { useState, Dispatch, SetStateAction, useEffect } from 'react'
+import { Playlist } from '../types/playlist.type'
+import { Video } from '../types/youtubesearch.type'
 
 interface Props {
-  playlist: Playlist;
-  video: Video;
-  setPlaylistTracks: Dispatch<SetStateAction<Video[]>>;
+  playlist: Playlist
+  video: Video
+  setPlaylistTracks: Dispatch<SetStateAction<Video[]>>
 }
 
-export default function Playlisttrack({
-  playlist,
-  video,
-  setPlaylistTracks,
-}: Props) {
-  const [startTime, setStartTime] = useState<number>(video.starttime || 0);
-  const [duration, setDuration] = useState<number>(0);
+export default function Playlisttrack({ playlist, video, setPlaylistTracks }: Props) {
+  const [startTime, setStartTime] = useState<number>(video.starttime || 0)
+  const [duration, setDuration] = useState<number>(0)
 
   const removeFromPlaylist = (video: Video) => {
     if (playlist.videos.includes(video)) {
       setPlaylistTracks((playlistTracks) => {
         return playlistTracks.filter((track) => {
-          return track !== video;
-        });
-      });
+          return track !== video
+        })
+      })
     }
-  };
+  }
 
   const convertToDisplayTime = (time: number) => {
-    return new Date(time * 1000).toISOString().substr(11, 8);
-  };
+    return new Date(time * 1000).toISOString().substr(11, 8)
+  }
 
   useEffect(() => {
     const updateTime = setTimeout(() => {
-      video.starttime = startTime;
-    }, 500);
+      video.starttime = startTime
+    }, 500)
     return () => {
-      clearTimeout(updateTime);
-    };
-  }, [startTime]);
+      clearTimeout(updateTime)
+    }
+  }, [startTime])
 
   useEffect(() => {
     let iso8601DurationRegex =
-      /(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/;
+      /(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/
 
     let newDuration = function (iso8601Duration: string) {
-      let matches = iso8601Duration.match(iso8601DurationRegex);
+      let matches = iso8601Duration.match(iso8601DurationRegex)
       if (matches) {
         return {
-          sign: matches[1] === undefined ? "+" : "-",
+          sign: matches[1] === undefined ? '+' : '-',
           years: matches[2] === undefined ? 0 : parseInt(matches[2]),
           months: matches[3] === undefined ? 0 : parseInt(matches[3]),
           weeks: matches[4] === undefined ? 0 : parseInt(matches[4]),
           days: matches[5] === undefined ? 0 : parseInt(matches[5]),
           hours: matches[6] === undefined ? 0 : parseInt(matches[6]),
           minutes: matches[7] === undefined ? 0 : parseInt(matches[7]),
-          seconds: matches[8] === undefined ? 0 : parseInt(matches[8]),
-        };
-      }
-    };
-
-    if (video.contentDetails?.duration) {
-      let durationObject = newDuration(video.contentDetails?.duration);
-      if (durationObject) {
-        let durationSeconds: number =
-          durationObject.hours * 3600 +
-          durationObject.minutes * 60 +
-          durationObject.seconds;
-        setDuration(durationSeconds);
+          seconds: matches[8] === undefined ? 0 : parseInt(matches[8])
+        }
       }
     }
-  }, []);
+
+    if (video.contentDetails?.duration) {
+      let durationObject = newDuration(video.contentDetails?.duration)
+      if (durationObject) {
+        let durationSeconds: number =
+          durationObject.hours * 3600 + durationObject.minutes * 60 + durationObject.seconds
+        setDuration(durationSeconds)
+      }
+    }
+  }, [])
 
   return (
     <div id={video.id} className="flex flex-col w-full pl-5 pr-5">
@@ -78,7 +72,7 @@ export default function Playlisttrack({
         <div
           className="hover:cursor-pointer"
           onClick={(event: React.MouseEvent<HTMLElement>) => {
-            removeFromPlaylist(video);
+            removeFromPlaylist(video)
           }}
         >
           <svg
@@ -100,22 +94,20 @@ export default function Playlisttrack({
         <div>
           <label className="text-sm text-gray-500"> Start time: </label>
           <input
-            className="h-1 mb-6 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
+            className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
             type="range"
             min="0"
             max={duration.toString()}
             name="duration"
-            id={video.id + "_duration"}
+            id={video.id + '_duration'}
             value={startTime}
             onChange={(e) => {
-              setStartTime(parseInt(e.target.value));
+              setStartTime(parseInt(e.target.value))
             }}
           />
         </div>
-        <output className="border border-solid">
-          {convertToDisplayTime(startTime)}
-        </output>
+        <output className="border border-solid">{convertToDisplayTime(startTime)}</output>
       </div>
     </div>
-  );
+  )
 }

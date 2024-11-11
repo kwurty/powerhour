@@ -16,6 +16,88 @@ This project was made with React, using Typescript & MongoDB.
 - [ ] View/search for Playlists
 - [ ] Playlist ratings
 
+## MySQL Table Commands
+
+# Playlist
+'''
+CREATE TABLE powerhour.Playlist (
+id int NOT NULL AUTO_INCREMENT,
+Name varchar(100) NOT NULL,
+UserID int,
+PRIMARY KEY (id),
+CONSTRAINT FK_UserID FOREIGN KEY (UserID)
+REFERENCES powerhour.Users(id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_general_ci;
+'''
+
+# Videos
+'''
+CREATE TABLE powerhour.Videos (
+id varchar(100) NOT NULL,
+Name varchar(100) NOT NULL,
+Url varchar(255) NOT NULL,
+PRIMARY KEY (id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_general_ci;
+
+'''
+
+# Playlist_Videos
+'''
+CREATE TABLE powerhour.Playlist_Videos (
+id int NOT NULL AUTO_INCREMENT,
+VideoID varchar(100) NOT NULL,
+PlaylistID int NOT NULL,
+PRIMARY KEY (id),
+CONSTRAINT FK_PlaylistID FOREIGN KEY (PlaylistID)
+REFERENCES powerhour.Playlists(id),
+CONSTRAINT FK_VideoID FOREIGN KEY (VideoID)
+REFERENCES powerhour.Videos(id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_general_ci;
+'''
+
+# User_Bookmarked
+'''
+CREATE TABLE powerhour.User_Bookmarked (
+id int NOT NULL AUTO_INCREMENT,
+UserID int NOT NULL,
+PlaylistID int NOT NULL,
+PRIMARY KEY (id),
+CONSTRAINT FK_UserBookmarked_PlaylistID FOREIGN KEY (PlaylistID)
+REFERENCES powerhour.Playlists(id),
+CONSTRAINT FK_UserBookmarked_UserID FOREIGN KEY (UserID)
+REFERENCES powerhour.Users(id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_general_ci;
+'''
+
+# Playlist_Likes
+'''
+CREATE TABLE powerhour.Playlist_Likes (
+id int NOT NULL AUTO_INCREMENT,
+UserID int NOT NULL,
+PlaylistID int NOT NULL,
+PRIMARY KEY (id),
+CONSTRAINT FK_PlaylistLikes_PlaylistID FOREIGN KEY (PlaylistID)
+REFERENCES powerhour.Playlists(id),
+CONSTRAINT FK_PlaylistLikes_UserID FOREIGN KEY (UserID)
+REFERENCES powerhour.Users(id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8
+COLLATE=utf8_general_ci;
+'''
+
 ## Available Scripts
 
 In the project directory, you can run:
