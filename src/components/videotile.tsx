@@ -1,42 +1,52 @@
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
-import { Video } from "../types/youtubesearch.type";
+import {
+  Video,
+  ItemsEntity,
+  YoutubeResponseVideo,
+} from "../types/youtubesearch.type";
 import { isoConvert } from "../services/tools";
 import { VideoTime } from "../types/tools.type";
+import { convertResponseVideoToVideo } from "../services/convert-types";
 // import "../types/videotiles.type";
 
 interface Props {
-  video: Video;
+  video: YoutubeResponseVideo;
   playlistTracks: Video[];
   setPlaylistTracks: Dispatch<SetStateAction<Video[]>>;
-  playVideo: (video: Video) => void;
+  playVideo: (video: YoutubeResponseVideo | Video) => void;
 }
 
 export default function Videotile({
   video,
   playlistTracks,
   setPlaylistTracks,
-  playVideo,
-}: Props) {
+}: // playVideo,
+Props) {
   const [videoTime, setVideoTime] = useState<VideoTime>({
     hours: 0,
     minutes: 0,
     seconds: 0,
   });
 
-  const addToPlayList = (video: Video) => {
-    if (!playlistTracks.includes(video)) {
-      setPlaylistTracks([...playlistTracks, video]);
-    }
+  const convertToVideo = (youtubeVideo: YoutubeResponseVideo) => {
+    return {};
   };
 
-  const removeFromPlaylist = (video: Video) => {
-    if (playlistTracks.includes(video)) {
-      setPlaylistTracks((playlistTracks) => {
-        return playlistTracks.filter((track) => {
-          return track != video;
-        });
+  const findInPlaylist = (video: YoutubeResponseVideo) => {
+    return playlistTracks.findIndex((v) => v.id === video.id);
+  };
+
+  const addToPlayList = (video: YoutubeResponseVideo) => {
+    let converted = convertResponseVideoToVideo(video);
+    setPlaylistTracks([...playlistTracks, converted]);
+  };
+
+  const removeFromPlaylist = (video: YoutubeResponseVideo) => {
+    setPlaylistTracks((playlistTracks) => {
+      return playlistTracks.filter((track) => {
+        return track.id != video.id;
       });
-    }
+    });
   };
 
   useEffect(() => {
@@ -58,7 +68,7 @@ export default function Videotile({
       className="flex flex-row hover:bg-slate-300 cursor-pointer"
       onClick={(event: React.MouseEvent<HTMLElement>) => {
         if ((event.target as HTMLInputElement).tagName !== "BUTTON") {
-          playVideo(video);
+          // playVideo(video);
         }
       }}
     >
@@ -95,7 +105,7 @@ export default function Videotile({
           </h1>
         </div>
         <h3 className="text-sm">{video.snippet.channelTitle}</h3>
-        {!playlistTracks.includes(video) && (
+        {findInPlaylist(video) == -1 && (
           <button
             className="rounded bg-blue-300 border border-slate-700 py-1 px-3 text-blue-700"
             onClick={(event: React.MouseEvent<HTMLElement>) => {
@@ -105,7 +115,7 @@ export default function Videotile({
             Add To Playlist
           </button>
         )}
-        {playlistTracks.includes(video) && (
+        {findInPlaylist(video) != -1 && (
           <button
             className="rounded bg-blue-300 border border-slate-700 py-1 px-3 z-10 text-blue-700"
             onClick={(event: React.MouseEvent<HTMLElement>) => {

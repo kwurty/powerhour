@@ -1,78 +1,99 @@
-import React, { useState, Dispatch, SetStateAction, useEffect } from 'react'
-import { Playlist } from '../types/playlist.type'
-import { Video } from '../types/youtubesearch.type'
+import React, { useState, Dispatch, SetStateAction, useEffect } from "react";
+import { Playlist } from "../types/playlist.type";
+import { Video, YoutubeResponseVideo } from "../types/youtubesearch.type";
 
 interface Props {
-  playlist: Playlist
-  video: Video
-  setPlaylistTracks: Dispatch<SetStateAction<Video[]>>
+  playlist: Playlist;
+  video: Video;
+  setPlaylistTracks: Dispatch<SetStateAction<Video[]>>;
+  setPlayVideo: (video: YoutubeResponseVideo | Video) => void;
 }
 
-export default function Playlisttrack({ playlist, video, setPlaylistTracks }: Props) {
-  const [startTime, setStartTime] = useState<number>(video.starttime || 0)
-  const [duration, setDuration] = useState<number>(0)
+export default function Playlisttrack({
+  playlist,
+  video,
+  setPlaylistTracks,
+  setPlayVideo,
+}: Props) {
+  const [startTime, setStartTime] = useState<number>(video.starttime || 0);
+  const [duration, setDuration] = useState<number>(0);
 
   const removeFromPlaylist = (video: Video) => {
     if (playlist.videos.includes(video)) {
       setPlaylistTracks((playlistTracks) => {
         return playlistTracks.filter((track) => {
-          return track !== video
-        })
-      })
+          return track !== video;
+        });
+      });
     }
-  }
+  };
 
   const convertToDisplayTime = (time: number) => {
-    return new Date(time * 1000).toISOString().substr(11, 8)
-  }
+    return new Date(time * 1000).toISOString().substr(11, 8);
+  };
+
+  const playNow = (video: YoutubeResponseVideo | Video) => {
+    setPlayVideo(video);
+  };
 
   useEffect(() => {
     const updateTime = setTimeout(() => {
-      video.starttime = startTime
-    }, 500)
+      video.starttime = startTime;
+    }, 500);
     return () => {
-      clearTimeout(updateTime)
-    }
-  }, [startTime])
+      clearTimeout(updateTime);
+    };
+  }, [startTime]);
 
   useEffect(() => {
     let iso8601DurationRegex =
-      /(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/
+      /(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/;
 
     let newDuration = function (iso8601Duration: string) {
-      let matches = iso8601Duration.match(iso8601DurationRegex)
+      let matches = iso8601Duration.match(iso8601DurationRegex);
       if (matches) {
         return {
-          sign: matches[1] === undefined ? '+' : '-',
+          sign: matches[1] === undefined ? "+" : "-",
           years: matches[2] === undefined ? 0 : parseInt(matches[2]),
           months: matches[3] === undefined ? 0 : parseInt(matches[3]),
           weeks: matches[4] === undefined ? 0 : parseInt(matches[4]),
           days: matches[5] === undefined ? 0 : parseInt(matches[5]),
           hours: matches[6] === undefined ? 0 : parseInt(matches[6]),
           minutes: matches[7] === undefined ? 0 : parseInt(matches[7]),
-          seconds: matches[8] === undefined ? 0 : parseInt(matches[8])
-        }
+          seconds: matches[8] === undefined ? 0 : parseInt(matches[8]),
+        };
       }
-    }
+    };
 
-    if (video.contentDetails?.duration) {
-      let durationObject = newDuration(video.contentDetails?.duration)
+    if (video?.duration) {
+      let durationObject = newDuration(video?.duration);
       if (durationObject) {
         let durationSeconds: number =
-          durationObject.hours * 3600 + durationObject.minutes * 60 + durationObject.seconds
-        setDuration(durationSeconds)
+          durationObject.hours * 3600 +
+          durationObject.minutes * 60 +
+          durationObject.seconds;
+        setDuration(durationSeconds);
       }
     }
-  }, [])
+  }, []);
 
   return (
     <div id={video.id} className="flex flex-col w-full pl-5 pr-5">
       <div className="w-full flex justify-between">
-        <h1 className="h-6 truncate pr-4">{video.snippet.title}</h1>
+        <a
+          className="hover:cursor-pointer underline hover:text-red-500"
+          onClick={(event: React.MouseEvent<HTMLElement>) => {
+            if ((event.target as HTMLInputElement).tagName !== "BUTTON") {
+              playNow(video);
+            }
+          }}
+        >
+          <h1 className="h-6 truncate pr-4">{video.name}</h1>
+        </a>
         <div
           className="hover:cursor-pointer"
           onClick={(event: React.MouseEvent<HTMLElement>) => {
-            removeFromPlaylist(video)
+            removeFromPlaylist(video);
           }}
         >
           <svg
@@ -99,15 +120,17 @@ export default function Playlisttrack({ playlist, video, setPlaylistTracks }: Pr
             min="0"
             max={duration.toString()}
             name="duration"
-            id={video.id + '_duration'}
+            id={video.id + "_duration"}
             value={startTime}
             onChange={(e) => {
-              setStartTime(parseInt(e.target.value))
+              setStartTime(parseInt(e.target.value));
             }}
           />
         </div>
-        <output className="border border-solid">{convertToDisplayTime(startTime)}</output>
+        <output className="border border-solid">
+          {convertToDisplayTime(startTime)}
+        </output>
       </div>
     </div>
-  )
+  );
 }

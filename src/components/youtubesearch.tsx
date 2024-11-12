@@ -1,62 +1,58 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from 'react'
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 
-import { Video, ItemsEntity } from '../types/youtubesearch.type'
-import Videotile from './videotile'
+import {
+  Video,
+  ItemsEntity,
+  YoutubeSearchResult,
+  YoutubeResponseVideo,
+} from "../types/youtubesearch.type";
+import Videotile from "./videotile";
+import { convertResponseVideoToVideo } from "../services/convert-types";
 
 interface Props {
-  playlistTracks: Video[]
-  setPlaylistTracks: Dispatch<SetStateAction<Video[]>>
-  setPlayVideo: Dispatch<SetStateAction<Video>>
-  currentVideoTime: number
+  playlistTracks: Video[];
+  setPlaylistTracks: Dispatch<SetStateAction<Video[]>>;
+  setPlayVideo: Dispatch<SetStateAction<YoutubeResponseVideo | Video>>;
+  currentVideoTime: number;
 }
 
 export default function YoutubeSearch({
   playlistTracks,
   setPlaylistTracks,
   setPlayVideo,
-  currentVideoTime
+  currentVideoTime,
 }: Props) {
-  const [searchString, setSearchString] = useState<string>('kittycat')
-  const [searchResults, setSearchResults] = useState<Video[]>([])
+  const [searchString, setSearchString] = useState<string>("kittycat");
+  const [searchResults, setSearchResults] = useState<YoutubeResponseVideo[]>(
+    []
+  );
 
   const executeSearch = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    search()
-  }
+    event.preventDefault();
+    search();
+  };
 
-  const playNow = (video: Video) => {
-    setPlayVideo(video)
-  }
+  const playNow = (video: YoutubeResponseVideo | Video) => {
+    setPlayVideo(video);
+  };
 
   const search = async () => {
-    const resultListUnparsed = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?key=${
-        process.env.REACT_APP_YOUTUBE_API_KEY
-      }&type=video&maxResults=50&part=snippet&q=${encodeURIComponent(searchString)}`
-    )
-    const resultList = await resultListUnparsed.json()
+    const response = await fetch(
+      process.env.REACT_APP_BACKEND_API_BASE_API +
+        "youtube/search?q=" +
+        searchString
+    );
 
-    const ids = resultList?.items?.map((video: ItemsEntity) => {
-      return video.id.videoId
-    })
+    const youtubeSearchResults: YoutubeSearchResult = await response.json();
 
-    const videoResultsUnparsed = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?key=${
-        process.env.REACT_APP_YOUTUBE_API_KEY
-      }&part=snippet,contentDetails&id=${ids.join(',')}`
-    )
-
-    const videoResults = await videoResultsUnparsed.json()
-
-    setSearchResults(videoResults?.items)
-    console.dir(videoResults)
-  }
+    setSearchResults(youtubeSearchResults.items);
+  };
 
   useEffect(() => {
     if (currentVideoTime !== 0) {
-      console.log(currentVideoTime)
+      console.log(currentVideoTime);
     }
-  }, [currentVideoTime])
+  }, [currentVideoTime]);
 
   return (
     <div className="">
@@ -66,22 +62,23 @@ export default function YoutubeSearch({
           className="border-gray-500 border pl-1 rounded"
           value={searchString}
           onChange={(event: React.FormEvent<HTMLInputElement>) => {
-            setSearchString(event.currentTarget.value)
+            setSearchString(event.currentTarget.value);
           }}
         ></input>
         <button onClick={executeSearch}>Search</button>
       </form>
       <div className="overflow-y-scroll overflow-x-hidden overflow-y-scroll max-h-screen ">
-        {searchResults.map((video: Video, index) => {
-          return (
-            <div key={video.id}>
-              <Videotile
-                video={video}
-                playlistTracks={playlistTracks}
-                setPlaylistTracks={setPlaylistTracks}
-                playVideo={playNow}
-              />
-              {/* 
+        {searchResults &&
+          searchResults.map((video: YoutubeResponseVideo, index) => {
+            return (
+              <div key={video.id}>
+                <Videotile
+                  video={video}
+                  playlistTracks={playlistTracks}
+                  setPlaylistTracks={setPlaylistTracks}
+                  playVideo={playNow}
+                />
+                {/* 
               <button
                 onClick={() => {
                   console.log(currentVideoTime);
@@ -89,10 +86,10 @@ export default function YoutubeSearch({
               >
                 Get Current Video Time
               </button> */}
-            </div>
-          )
-        })}
+              </div>
+            );
+          })}
       </div>
     </div>
-  )
+  );
 }

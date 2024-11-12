@@ -19,7 +19,7 @@ export type YoutubeSearchResult = {
   nextPageToken: string;
   regionCode: string;
   pageInfo: PageInfo;
-  items: ItemsEntity[] | [];
+  items: YoutubeResponseVideo[];
 };
 export type PageInfo = {
   totalResults: number;
@@ -30,6 +30,7 @@ export type ItemsEntity = {
   etag: string;
   id: Id;
   snippet: Snippet;
+  contentDetails?: ContentDetails;
 };
 export type Id = {
   kind: string;
@@ -52,7 +53,7 @@ export type Localized = {
   title: string;
   description: string;
 };
-export type Video = {
+export type YoutubeResponseVideo = {
   kind: string;
   etag: string;
   id: string;
@@ -70,4 +71,14 @@ export type DefaultOrMediumOrHigh = {
   url: string;
   width: number;
   height: number;
+};
+
+export type Video = {
+  kind: string;
+  etag: string;
+  id: string;
+  starttime?: number;
+  duration: string;
+  name?: string;
+  description: string;
 };
