@@ -28,10 +28,6 @@ Props) {
     seconds: 0,
   });
 
-  const convertToVideo = (youtubeVideo: YoutubeResponseVideo) => {
-    return {};
-  };
-
   const findInPlaylist = (video: YoutubeResponseVideo) => {
     return playlistTracks.findIndex((v) => v.id === video.id);
   };

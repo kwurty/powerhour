@@ -28,6 +28,14 @@ export default function Playlisttrack({
     }
   };
 
+  const updateTime = (startTime: number) => {
+    setPlaylistTracks((previousTracks) =>
+      previousTracks.map((track) =>
+        video.id === track.id ? { ...track, starttime: startTime } : track
+      )
+    );
+  };
+
   const convertToDisplayTime = (time: number) => {
     return new Date(time * 1000).toISOString().substr(11, 8);
   };
@@ -113,7 +121,13 @@ export default function Playlisttrack({
       </div>
       <div className="flex justify-between text-base align-baseline">
         <div>
-          <label className="text-sm text-gray-500"> Start time: </label>
+          <label
+            className="text-sm text-gray-500"
+            onClick={(event: React.MouseEvent<HTMLElement>) => updateTime()}
+          >
+            {" "}
+            Start time:{" "}
+          </label>
           <input
             className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
             type="range"
@@ -127,7 +141,10 @@ export default function Playlisttrack({
             }}
           />
         </div>
-        <output className="border border-solid">
+        <output
+          className="border border-solid"
+          onClick={(event: React.MouseEvent<HTMLElement>) => updateTime}
+        >
           {convertToDisplayTime(startTime)}
         </output>
       </div>
