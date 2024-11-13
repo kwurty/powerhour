@@ -28,7 +28,7 @@ export default function Playlisttrack({
     }
   };
 
-  const updateTime = (startTime: number) => {
+  const updateTime = () => {
     setPlaylistTracks((previousTracks) =>
       previousTracks.map((track) =>
         video.id === track.id ? { ...track, starttime: startTime } : track
