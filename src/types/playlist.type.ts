@@ -12,6 +12,13 @@ export type Playlist = {
   plays: number;
 };
 
+export type CreatedPlaylist = {
+  id: number;
+  name: string;
+  videos: Video[];
+  likes?: number;
+  plays?: number;
+}
 export type PlaylistEdit = {
   name: string,
   videos: Video[],

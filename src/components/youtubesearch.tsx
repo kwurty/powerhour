@@ -56,17 +56,25 @@ export default function YoutubeSearch({
 
   return (
     <div className="">
-      <form>
-        <label htmlFor="searchString">Search: </label>
-        <input
-          className="border-gray-500 border pl-1 rounded"
-          value={searchString}
-          onChange={(event: React.FormEvent<HTMLInputElement>) => {
-            setSearchString(event.currentTarget.value);
-          }}
-        ></input>
-        <button onClick={executeSearch}>Search</button>
-      </form>
+      <div className="mx-4 pb-4 pt-4 flex justify-center bg-gray-100">
+        <div className="flex w-full bg-white border border-gray-300 rounded-lg shadow-md">
+          <input
+            type="text"
+            value={searchString}
+            onChange={(event: React.FormEvent<HTMLInputElement>) => {
+              setSearchString(event.currentTarget.value);
+            }}
+            placeholder="Search..."
+            className="flex-grow px-4 py-2 text-gray-700 bg-transparent focus:outline-none focus:ring focus:ring-blue-300 rounded-l-lg"
+          />
+          <button
+            onClick={executeSearch}
+            className="px-4 py-2 text-white bg-blue-600 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
+          >
+            Search
+          </button>
+        </div>
+      </div>
       <div className="overflow-y-scroll overflow-x-hidden overflow-y-scroll max-h-screen ">
         {searchResults &&
           searchResults.map((video: YoutubeResponseVideo, index) => {

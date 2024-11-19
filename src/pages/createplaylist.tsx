@@ -144,7 +144,7 @@ export default function CreatePlaylist({ isEdit }: props) {
           process.env.REACT_APP_BACKEND_API_BASE_API + "playlists/" + id
         );
 
-        if (response.status == 401) {
+        if (response.status === 401) {
           return setUnauthorized(true);
         }
 

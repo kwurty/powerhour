@@ -40,7 +40,7 @@ Props) {
   const removeFromPlaylist = (video: YoutubeResponseVideo) => {
     setPlaylistTracks((playlistTracks) => {
       return playlistTracks.filter((track) => {
-        return track.id != video.id;
+        return track.id !== video.id;
       });
     });
   };
@@ -101,7 +101,7 @@ Props) {
           </h1>
         </div>
         <h3 className="text-sm">{video.snippet.channelTitle}</h3>
-        {findInPlaylist(video) == -1 && (
+        {findInPlaylist(video) === -1 && (
           <button
             className="rounded bg-blue-300 border border-slate-700 py-1 px-3 text-blue-700"
             onClick={(event: React.MouseEvent<HTMLElement>) => {
@@ -111,7 +111,7 @@ Props) {
             Add To Playlist
           </button>
         )}
-        {findInPlaylist(video) != -1 && (
+        {findInPlaylist(video) !== -1 && (
           <button
             className="rounded bg-blue-300 border border-slate-700 py-1 px-3 z-10 text-blue-700"
             onClick={(event: React.MouseEvent<HTMLElement>) => {

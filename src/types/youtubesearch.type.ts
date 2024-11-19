@@ -81,4 +81,5 @@ export type Video = {
   duration: string;
   name?: string;
   description: string;
+  thumbnails: Thumbnails;
 };

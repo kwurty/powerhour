@@ -1,6 +1,7 @@
 import React, { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { Playlist } from "../types/playlist.type";
 import { Video, YoutubeResponseVideo } from "../types/youtubesearch.type";
+import { convertToSeconds, isoConvert, timeObject } from "../services/tools";
 
 interface Props {
   playlist: Playlist;
@@ -45,42 +46,15 @@ export default function Playlisttrack({
   };
 
   useEffect(() => {
-    const updateTime = setTimeout(() => {
-      video.starttime = startTime;
-    }, 500);
-    return () => {
-      clearTimeout(updateTime);
-    };
-  }, [startTime]);
+    video.starttime = startTime;
+  }, [startTime, video]);
 
   useEffect(() => {
-    let iso8601DurationRegex =
-      /(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/;
-
-    let newDuration = function (iso8601Duration: string) {
-      let matches = iso8601Duration.match(iso8601DurationRegex);
-      if (matches) {
-        return {
-          sign: matches[1] === undefined ? "+" : "-",
-          years: matches[2] === undefined ? 0 : parseInt(matches[2]),
-          months: matches[3] === undefined ? 0 : parseInt(matches[3]),
-          weeks: matches[4] === undefined ? 0 : parseInt(matches[4]),
-          days: matches[5] === undefined ? 0 : parseInt(matches[5]),
-          hours: matches[6] === undefined ? 0 : parseInt(matches[6]),
-          minutes: matches[7] === undefined ? 0 : parseInt(matches[7]),
-          seconds: matches[8] === undefined ? 0 : parseInt(matches[8]),
-        };
-      }
-    };
-
-    if (video?.duration) {
-      let durationObject = newDuration(video?.duration);
-      if (durationObject) {
-        let durationSeconds: number =
-          durationObject.hours * 3600 +
-          durationObject.minutes * 60 +
-          durationObject.seconds;
-        setDuration(durationSeconds);
+    if (video && video.duration) {
+      let time = isoConvert(video.duration);
+      if (time) {
+        let newDuration: number = convertToSeconds(time);
+        setDuration(newDuration);
       }
     }
   }, []);
@@ -88,16 +62,16 @@ export default function Playlisttrack({
   return (
     <div id={video.id} className="flex flex-col w-full pl-5 pr-5">
       <div className="w-full flex justify-between">
-        <a
-          className="hover:cursor-pointer underline hover:text-red-500"
+        <h1
+          className="h-6 truncate pr-4 hover:cursor-pointer underline hover:text-red-500"
           onClick={(event: React.MouseEvent<HTMLElement>) => {
             if ((event.target as HTMLInputElement).tagName !== "BUTTON") {
               playNow(video);
             }
           }}
         >
-          <h1 className="h-6 truncate pr-4">{video.name}</h1>
-        </a>
+          {video.name}
+        </h1>
         <div
           className="hover:cursor-pointer"
           onClick={(event: React.MouseEvent<HTMLElement>) => {
@@ -123,7 +97,7 @@ export default function Playlisttrack({
         <div>
           <label
             className="text-sm text-gray-500"
-            onClick={(event: React.MouseEvent<HTMLElement>) => updateTime()}
+            // onClick={(event: React.MouseEvent<HTMLElement>) => updateTime()}
           >
             {" "}
             Start time:{" "}
@@ -141,9 +115,27 @@ export default function Playlisttrack({
             }}
           />
         </div>
+        <label>
+          Time (HH:MM:SS):{" "}
+          <input
+            type="text"
+            value={convertToDisplayTime(startTime)}
+            onChange={(e) => {
+              const value = e.target.value;
+              console.log(value);
+              if (/^\d{0,2}:\d{0,2}:\d{0,2}$/.test(value)) {
+                // Allow only valid HH:MM:SS formats during typing
+                console.log(parseInt(value));
+                setStartTime(parseInt(value));
+              }
+            }}
+            placeholder="00:00:00"
+            style={{ width: "100px", textAlign: "center" }}
+          />
+        </label>
         <output
           className="border border-solid"
-          onClick={(event: React.MouseEvent<HTMLElement>) => updateTime}
+          // onClick={(event: React.MouseEvent<HTMLElement>) => updateTime}
         >
           {convertToDisplayTime(startTime)}
         </output>
