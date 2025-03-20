@@ -1,17 +1,20 @@
 # Powerhour Creator
 
-This project was made with React, using Typescript & MongoDB.
+This project was made with React, using Typescript & MySQL.
 
 ## ToDo
 
 - [x] YouTube video player
 - [x] YouTube Search
-- [ ] Creation of Playlists
-- [ ] Saving playlists to database
-- [ ] Local storage for playlist
-- [ ] User sign in
+- [x] Creation of Playlists
+- [x] Saving playlists to database
+- [x] Local storage for playlist
+- [x] User sign in
+- [ ] Create vs. Edit Playlist
+- [ ] Set current time for playing video
 - [ ] Like system for playlists
 - [ ] Comments for playlists
+- [ ] Filtering system for names / comments
 - [ ] Playcount on playlists
 - [ ] View/search for Playlists
 - [ ] Playlist ratings

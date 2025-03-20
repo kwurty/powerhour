@@ -1,23 +1,41 @@
 import React, { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { Playlist } from "../types/playlist.type";
 import { Video, YoutubeResponseVideo } from "../types/youtubesearch.type";
-import { convertToSeconds, isoConvert, timeObject } from "../services/tools";
+import {
+  convertToSeconds,
+  deleteLocalStorage,
+  isoConvert,
+  debounce,
+} from "../services/tools";
+
+import { toast } from "react-toastify";
 
 interface Props {
   playlist: Playlist;
   video: Video;
   setPlaylistTracks: Dispatch<SetStateAction<Video[]>>;
   setPlayVideo: (video: YoutubeResponseVideo | Video) => void;
+  setPlaylist: Dispatch<SetStateAction<Playlist>>;
+  isEdit: boolean;
 }
+
+type displayTimeType = {
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
 
 export default function Playlisttrack({
   playlist,
   video,
   setPlaylistTracks,
   setPlayVideo,
+  setPlaylist,
+  isEdit,
 }: Props) {
   const [startTime, setStartTime] = useState<number>(video.starttime || 0);
-  const [duration, setDuration] = useState<number>(0);
+  const [duration, setDuration] = useState<number>();
+  const [displayedTime, setDisplayedTime] = useState<displayTimeType>();
 
   const removeFromPlaylist = (video: Video) => {
     if (playlist.videos.includes(video)) {
@@ -27,29 +45,77 @@ export default function Playlisttrack({
         });
       });
     }
+    if (playlist.videos.length === 0 && isEdit) {
+      deleteLocalStorage("newPlaylist");
+    }
   };
 
-  const updateTime = () => {
-    setPlaylistTracks((previousTracks) =>
-      previousTracks.map((track) =>
-        video.id === track.id ? { ...track, starttime: startTime } : track
-      )
-    );
-  };
-
-  const convertToDisplayTime = (time: number) => {
-    return new Date(time * 1000).toISOString().substr(11, 8);
+  const displayTime = () => {
+    if (startTime === 0) {
+      return { hours: 0, minutes: 0, seconds: 0 };
+    } else if (Number(startTime) && startTime) {
+      const hrs = Math.floor(startTime / 3600) || 0;
+      const mins = Math.floor((startTime % 3600) / 60) || 0;
+      const secs = startTime % 60 || 0;
+      return { hours: hrs, minutes: mins, seconds: secs };
+    }
   };
 
   const playNow = (video: YoutubeResponseVideo | Video) => {
     setPlayVideo(video);
   };
 
-  useEffect(() => {
-    video.starttime = startTime;
-  }, [startTime, video]);
+  // Function to show toast
+  const showToast = () => {
+    toast("There needs to be at least 60 seconds!");
+  };
+
+  // Debounced version of the trigger logic
+  const debouncedShowToast = debounce(showToast, 300);
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (duration && Number(e.target.value) > duration - 60) {
+      debouncedShowToast();
+      return;
+    }
+    setStartTime(Number(e.target.value));
+  };
+
+  const handleManualInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!duration) return;
+
+    const value = e.target.value;
+    const [hrs = 0, mins = 0, secs = 0] = value.split(":").map(Number);
+
+    // Convert input to total seconds and clamp within bounds
+    const totalSeconds = hrs * 3600 + mins * 60 + secs;
+    if (duration && totalSeconds > duration - 60) {
+      toast("There needs to be at least 60 seconds!");
+      return setStartTime(duration - 62);
+    }
+    if (!isNaN(totalSeconds)) {
+      setStartTime(Math.min(Math.max(totalSeconds, 0), duration));
+    }
+  };
 
   useEffect(() => {
+    setDisplayedTime(displayTime());
+    setPlaylistTracks((previousTracks) => {
+      return previousTracks.map((track, index) => {
+        if (track.id === video.id) {
+          track.starttime = startTime;
+        }
+        return track;
+      });
+    });
+  }, [startTime]);
+
+  useEffect(() => {
+    if (video && video.starttime) {
+      setStartTime(video.starttime);
+    } else {
+      setStartTime(0);
+    }
     if (video && video.duration) {
       let time = isoConvert(video.duration);
       if (time) {
@@ -57,10 +123,13 @@ export default function Playlisttrack({
         setDuration(newDuration);
       }
     }
-  }, []);
+  }, [video]);
 
   return (
-    <div id={video.id} className="flex flex-col w-full pl-5 pr-5">
+    <div
+      id={video.id}
+      className="flex flex-col w-full pl-5 pr-5 max-h-vh-minus-256"
+    >
       <div className="w-full flex justify-between">
         <h1
           className="h-6 truncate pr-4 hover:cursor-pointer underline hover:text-red-500"
@@ -79,7 +148,7 @@ export default function Playlisttrack({
           }}
         >
           <svg
-            className="w-5 h-5 text-red-500 hover:bg-red-200 hover:text-red-700 hover:rounded-xl"
+            className="w-5 h-5 text-cinnabar-500 hover:bg-cinnabar-500 hover:text-white hover:rounded-xl"
             aria-hidden="true"
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -102,43 +171,44 @@ export default function Playlisttrack({
             {" "}
             Start time:{" "}
           </label>
-          <input
-            className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
-            type="range"
-            min="0"
-            max={duration.toString()}
-            name="duration"
-            id={video.id + "_duration"}
-            value={startTime}
-            onChange={(e) => {
-              setStartTime(parseInt(e.target.value));
-            }}
-          />
+          <div className="sliderContainer">
+            <input
+              type="range"
+              min="0"
+              max={duration}
+              value={startTime}
+              onChange={(e) => {
+                handleSliderChange(e);
+              }}
+              className="slider accent-cinnabar-500"
+            />
+          </div>
         </div>
-        <label>
-          Time (HH:MM:SS):{" "}
-          <input
-            type="text"
-            value={convertToDisplayTime(startTime)}
-            onChange={(e) => {
-              const value = e.target.value;
-              console.log(value);
-              if (/^\d{0,2}:\d{0,2}:\d{0,2}$/.test(value)) {
-                // Allow only valid HH:MM:SS formats during typing
-                console.log(parseInt(value));
-                setStartTime(parseInt(value));
-              }
-            }}
-            placeholder="00:00:00"
-            style={{ width: "100px", textAlign: "center" }}
-          />
-        </label>
-        <output
-          className="border border-solid"
-          // onClick={(event: React.MouseEvent<HTMLElement>) => updateTime}
-        >
-          {convertToDisplayTime(startTime)}
-        </output>
+        {displayedTime && (
+          <div className="flex flex-col justify-between align-baseline">
+            <label
+              className="text-sm text-gray-500 text-center"
+              // onClick={(event: React.MouseEvent<HTMLElement>) => updateTime()}
+            >
+              {" "}
+              HH:MM:SS{" "}
+            </label>
+            <input
+              type="text"
+              placeholder="HH:MM:SS"
+              value={`${displayedTime.hours
+                .toString()
+                .padStart(2, "0")}:${displayedTime.minutes
+                .toString()
+                .padStart(2, "0")}:${displayedTime.seconds
+                .toString()
+                .padStart(2, "0")}`}
+              onChange={handleManualInputChange}
+              className="input text-white rounded-md text-center bg-transparent border border-white focus:outline-none"
+              style={{ width: "80px" }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

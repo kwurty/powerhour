@@ -50,7 +50,8 @@ export default function YoutubePlayer({ videoid, setCurrentVideoTime }: Props) {
     <>
       <YouTube
         videoId={videoid}
-        className="youtubeContainer"
+        className="w-full aspect-video"
+        iframeClassName="w-full"
         opts={opts}
         onReady={onPlayerReady}
       />

@@ -24,7 +24,6 @@ const HomePage = () => {
           </p>
         </div>
       </div>
-
       {/* Description Section */}
       <div className="py-16 px-6 bg-gray-100 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-8">
@@ -38,22 +37,21 @@ const HomePage = () => {
           app makes it easy to keep the fun going.
         </p>
       </div>
-
       {/* Call-to-Action Section */}
-      <div className="py-16 bg-gradient-to-b from-indigo-600 to-purple-600 text-white text-center">
+      <div className="py-16 bg-gradient-to-b from-cinnabar-600 to-cinnabar-900 text-white text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-6">
           Ready to Get Started?
         </h2>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Link
             to="/playlists"
-            className="px-8 py-4 bg-indigo-800 hover:bg-indigo-700 rounded-lg text-lg font-semibold transition duration-300"
+            className="text-cinnabar-700 px-8 py-4 hover:bg-cinnabar-50 border-cinnabar-500 hover:border-cinnabar-700 bg-white rounded-lg text-lg font-semibold transition duration-300"
           >
             Explore Playlists
           </Link>
           <Link
             to="/create"
-            className="px-8 py-4 bg-purple-800 hover:bg-purple-700 rounded-lg text-lg font-semibold transition duration-300"
+            className="px-8 py-4 bg-gray-800 hover:bg-gray-900 rounded-lg text-lg font-semibold transition duration-300"
           >
             Create a Playlist
           </Link>

@@ -3,11 +3,8 @@ import YoutubePlayer from "../components/youtubeplayer";
 import YoutubeSearch from "../components/youtubesearch";
 import PlaylistView from "../components/playlist";
 import { Playlist } from "../types/playlist.type";
-import {
-  Video,
-  Snippet,
-  YoutubeResponseVideo,
-} from "../types/youtubesearch.type";
+import { setLocalStorage, getLocalStorage } from "../services/tools";
+import { Video, YoutubeResponseVideo } from "../types/youtubesearch.type";
 import { useParams } from "react-router-dom";
 
 type props = {
@@ -21,7 +18,9 @@ export default function CreatePlaylist({ isEdit }: props) {
   const [playVideo, setPlayVideo] = useState<YoutubeResponseVideo | Video>({
     kind: "youtube#video",
     etag: "yhnL9TPZaE5vmy8y7Q7P6NrxVDE",
-    id: "XF8t3z6Mc94",
+    id: "pbqB2vOFdlc",
+    user_id: 0,
+    user_name: "",
     snippet: {
       publishedAt: "2021-08-06T14:00:26Z",
       channelId: "UCTtPd40aikv5DWdW3KGkrQA",
@@ -90,6 +89,15 @@ export default function CreatePlaylist({ isEdit }: props) {
       },
       defaultAudioLanguage: "en-GB",
     },
+    contentDetails: {
+      duration: "PT1M",
+      dimension: "2d",
+      definition: "hd",
+      caption: "false",
+      licensedContent: true,
+      contentRating: {},
+      projection: "rectangular",
+    },
   });
 
   const [unauthorized, setUnauthorized] = useState<Boolean>(false);
@@ -101,24 +109,28 @@ export default function CreatePlaylist({ isEdit }: props) {
     videos: [],
     likes: 0,
     plays: 0,
+    user_id: 0,
+    user_name: "",
   });
 
   // Conditionally set the playlist based on new playlist vs editing playlist.
   // There's probably a better way to do this, but I didn't want to rewrite
   // an entire component that will be essentially the same functionality
   useEffect(() => {
-    if (!isEdit) {
-      setPlaylist((playlist) => ({
-        ...playlist,
-        videos: playlistTracks,
-      }));
-    }
+    setPlaylist((playlist) => ({
+      ...playlist,
+      videos: playlistTracks,
+    }));
   }, [playlistTracks]);
 
   useEffect(() => {
     if (!isEdit) {
       if (playlist.videos.length > 0) {
-        localStorage.setItem("newPlaylist", JSON.stringify(playlist));
+        setLocalStorage("newPlaylist", playlist);
+      }
+    } else {
+      if (playlist.videos.length > 0) {
+        setLocalStorage("editPlaylist", playlist);
       }
     }
   }, [playlist]);
@@ -126,34 +138,31 @@ export default function CreatePlaylist({ isEdit }: props) {
   useEffect(() => {
     if (!isEdit) {
       // check for existing playlist...
-      if (localStorage.getItem("newPlaylist")) {
-        let storedPlaylist = localStorage.getItem("newPlaylist");
-        if (storedPlaylist) {
-          let plObj = JSON.parse(storedPlaylist);
-          setPlaylist(plObj);
-          setPlaylistTracks(plObj.videos);
-        }
+      const localNewPlaylist = getLocalStorage("newPlaylist");
+      if (localNewPlaylist) {
+        setPlaylist(localNewPlaylist);
+        setPlaylistTracks(localNewPlaylist.videos);
       }
-    }
-  }, []);
+    } else {
+      const localEditPlaylist = getLocalStorage("editPlaylist");
+      if (localEditPlaylist && id && localEditPlaylist.id === id) {
+      } else {
+        const getPlaylist = async () => {
+          let response = await fetch(
+            process.env.REACT_APP_BACKEND_API_BASE_API + "playlists/" + id
+          );
 
-  useEffect(() => {
-    if (isEdit && id) {
-      const getPlaylist = async () => {
-        let response = await fetch(
-          process.env.REACT_APP_BACKEND_API_BASE_API + "playlists/" + id
-        );
+          if (response.status === 401) {
+            return setUnauthorized(true);
+          }
 
-        if (response.status === 401) {
-          return setUnauthorized(true);
-        }
-
-        let playList = await response.json();
-        if (playList) {
-          setPlaylist(playList);
-        }
-      };
-      getPlaylist();
+          let playList = await response.json();
+          if (playList) {
+            setPlaylist(playList);
+          }
+        };
+        getPlaylist();
+      }
     }
   }, []);
 
@@ -164,20 +173,22 @@ export default function CreatePlaylist({ isEdit }: props) {
     }));
   };
 
-  if (!isEdit || (isEdit && !unauthorized && playlist.id != undefined)) {
+  if (!isEdit || (isEdit && !unauthorized && playlist.id !== undefined)) {
     return (
-      <div className="grid sm:grid-cols-3 sm:grid-rows-1 lg:grid-cols-5 lg:grid-rows-1 ">
+      <div className="grid sm:grid-cols-3 sm:grid-rows-1 lg:grid-cols-7 lg:grid-rows-1 ">
         {/* <button onClick={changeVideoHandler}> change video </button> */}
 
-        <div className="lg:col-span-2 sm:col-span-3 sm:overflow-y-scroll sm:pt-2 row-start-1 sm:min-h-48 sm:max-h-48 lg:max-h-screen">
+        <div className="lg:col-span-2 sm:col-span-3 sm:overflow-y-scroll sm:pt-2 row-start-1 sm:min-h-48 sm:max-h-48 lg:max-h-screen bg-gray-900">
           <PlaylistView
             playlist={playlist}
             setPlaylistTracks={setPlaylistTracks}
             setPlaylistName={setPlaylistName}
             setPlayVideo={setPlayVideo}
+            setPlaylist={setPlaylist}
+            isEdit={isEdit}
           />
         </div>
-        <div className="col-span-2 sm:row-start-2 lg:row-start-1 ">
+        <div className="col-span-3 sm:row-start-2 lg:row-start-1 ">
           <div className="w-full">
             <YoutubePlayer
               videoid={playVideo.id}
@@ -185,7 +196,7 @@ export default function CreatePlaylist({ isEdit }: props) {
             />
           </div>
         </div>
-        <div className="w-full lg:col-span-1 sm:col-start-3 sm:row-start-2 lg:row-start-1 lg:max-h-screen">
+        <div className="w-full lg:col-span-2 sm:col-start-3 sm:row-start-2 lg:row-start-1 lg:max-h-screen bg-gray-900">
           <YoutubeSearch
             playlistTracks={playlistTracks}
             setPlaylistTracks={setPlaylistTracks}
@@ -195,7 +206,7 @@ export default function CreatePlaylist({ isEdit }: props) {
         </div>
       </div>
     );
-  } else if (isEdit && !unauthorized && playlist.id == undefined) {
+  } else if (isEdit && !unauthorized && playlist.id === undefined) {
     return <div>This playlist does not exist.</div>;
   } else if (isEdit && unauthorized) {
     return <div>You do not have permission to edit this playlist.</div>;

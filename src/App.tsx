@@ -24,7 +24,7 @@ function App() {
     createRoutesFromElements(
       <Route element={<RouterContainer />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:id" element={<Profile />} />
         <Route path="/create" element={<CreatePlaylist isEdit={false} />} />
         <Route path="/edit/:id" element={<CreatePlaylist isEdit={true} />} />
         <Route path="/playlists" element={<Playlists />} />
@@ -37,7 +37,7 @@ function App() {
 
   return (
     <UserProvider>
-      <div className="App">
+      <div className="App bg-gray-900" style={{}}>
         <RouterProvider router={router} />
       </div>
     </UserProvider>

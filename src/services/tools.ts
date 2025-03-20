@@ -49,3 +49,49 @@ export function convertToSeconds(timeObject: timeObject) {
     seconds
   );
 }
+
+export function setLocalStorage(name: string, data: object) {
+  // check for existing playlist...
+  // not sure if we need to account for it or not yet
+  if (localStorage.getItem(name)) {
+    // overwrite
+    localStorage.setItem(name, JSON.stringify(data));
+  } else {
+    // create
+    localStorage.setItem(name, JSON.stringify(data));
+  }
+}
+
+export function getLocalStorage(name: string) {
+  // check for existing playlist...
+  if (localStorage.getItem(name)) {
+    const localJSON = localStorage.getItem(name);
+    if (localJSON) {
+      return JSON.parse(localJSON);
+    } else {
+      return null;
+    }
+  } else {
+    return null;
+  }
+}
+
+export function deleteLocalStorage(name: string) {
+  if (localStorage.getItem(name)) {
+    localStorage.removeItem(name);
+  }
+}
+
+export function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+
+  return (...args: Parameters<T>): void => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+}

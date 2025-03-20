@@ -54,12 +54,14 @@ export type Localized = {
   description: string;
 };
 export type YoutubeResponseVideo = {
+  user_id?: number;
+  user_name?: string;
   kind: string;
   etag: string;
   id: string;
   starttime?: number;
   snippet: Snippet;
-  contentDetails?: ContentDetails;
+  contentDetails: ContentDetails;
 };
 
 export type Thumbnails = {
@@ -82,4 +84,5 @@ export type Video = {
   name?: string;
   description: string;
   thumbnails: Thumbnails;
+  contentDetails: ContentDetails;
 };
