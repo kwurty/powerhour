@@ -152,6 +152,16 @@ export default function PlaylistTile({ Name, Id, Image, Playlist }: props) {
           </svg>
         </button>
       </div>
+<<<<<<< HEAD
     </div>
   );
+=======
+      <div className="p-4 text-center bg-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition duration-300">
+          {Name}
+        </h3>
+      </div>
+    </Link>
+  )
+>>>>>>> d2bd5a5736a06c310529b5b73157898bbbc4fcaa
 }

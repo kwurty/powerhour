@@ -1,7 +1,7 @@
-import { Playlist } from "./playlist.type";
+import { PlaylistType } from './playlist.type'
 
 export type User = {
-  username: string;
-  email: string;
-  playlists: Playlist[];
-};
+  username: string
+  email: string
+  playlists: PlaylistType[]
+}
