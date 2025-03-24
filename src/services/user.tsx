@@ -10,8 +10,9 @@ import { jwtDecode } from "jwt-decode";
 // Define the User interface
 interface User {
   id: number;
-  name: string;
+  username: string;
   email: string;
+  iat: number;
 }
 
 // Define the context state types

@@ -12,12 +12,18 @@ This project was made with React, using Typescript & MySQL.
 - [x] User sign in
 - [ ] Create vs. Edit Playlist
 - [ ] Set current time for playing video
-- [ ] Like system for playlists
+- [x] Like system for playlists
 - [ ] Comments for playlists
 - [ ] Filtering system for names / comments
 - [ ] Playcount on playlists
 - [ ] View/search for Playlists
 - [ ] Playlist ratings
+- [ ] Playlist search & filters
+- [ ] Instructions on player for using the maximize button
+- [ ] Hide the left toolbar (optional setting) on full screen
+- [ ] Hide the Up Next (optional)
+- [ ] Show all videos (optional)
+
 
 ## MySQL Table Commands
 

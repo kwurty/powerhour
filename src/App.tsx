@@ -25,6 +25,7 @@ function App() {
       <Route element={<RouterContainer />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/profile/:id" element={<Profile />} />
+        <Route path="/profile/:id/edit" element={<Profile />} />
         <Route path="/create" element={<CreatePlaylist isEdit={false} />} />
         <Route path="/edit/:id" element={<CreatePlaylist isEdit={true} />} />
         <Route path="/playlists" element={<Playlists />} />

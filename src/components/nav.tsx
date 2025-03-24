@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, redirect } from "react-router-dom";
 import "../styles/nav.scss";
 import { useUser } from "../services/user";
 
@@ -11,6 +11,11 @@ export default function Nav() {
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
   const toggleMenu = () => setMenuOpen(!menuOpen);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    redirect("/");
+  };
   // return (
   //   <nav className="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900">
   //     <div className="container flex flex-wrap items-center justify-between mx-auto">
@@ -181,9 +186,9 @@ export default function Nav() {
               <div className="relative items-center space-x-4 hidden md:flex">
                 {/* Profile Icon */}
                 <Link to={`/profile/${user.id}`}>
-                  <button className="w-8 h-8 rounded-full border-2 border-white overflow-hidden">
+                  <button className="w-8 h-8 rounded-full border-2 border-white overflow-hidden hover:drop-shadow-lg">
                     <img
-                      src="https://via.placeholder.com/40"
+                      src="https://placehold.co/40"
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
@@ -217,13 +222,13 @@ export default function Nav() {
                 {dropdownOpen && (
                   <div className="z-50 absolute right-0 top-12 bg-white text-black rounded-lg shadow-lg w-48">
                     <Link
-                      to="/profile/edit"
+                      to={"/profile/" + user.id + "/edit"}
                       className="block px-4 py-2 hover:bg-gray-200 rounded-lg"
                     >
                       Edit Profile
                     </Link>
                     <button
-                      onClick={() => console.log("Logging out...")}
+                      onClick={() => logout()}
                       className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-lg"
                     >
                       Logout
@@ -307,7 +312,7 @@ export default function Nav() {
               </Link>
               <button
                 onClick={() => {
-                  console.log("Logging out...");
+                  logout();
                   toggleMenu();
                 }}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-600"

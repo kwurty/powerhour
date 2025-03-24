@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { Playlist } from "../types/playlist.type";
 import { Video, YoutubeResponseVideo } from "../types/youtubesearch.type";
@@ -37,33 +36,15 @@ export default function Playlisttrack({
   const [startTime, setStartTime] = useState<number>(video.starttime || 0);
   const [duration, setDuration] = useState<number>();
   const [displayedTime, setDisplayedTime] = useState<displayTimeType>();
-=======
-import React, { useState, Dispatch, SetStateAction, useEffect } from 'react'
-import { PlaylistType } from '../types/playlist.type'
-import { Video, YoutubeResponseVideo } from '../types/youtubesearch.type'
-import { convertToSeconds, isoConvert, timeObject } from '../services/tools'
-
-interface Props {
-  playlist: PlaylistType
-  video: Video
-  setPlaylistTracks: Dispatch<SetStateAction<Video[]>>
-  setPlayVideo: (video: YoutubeResponseVideo | Video) => void
-}
-
-export default function Playlisttrack({ playlist, video, setPlaylistTracks, setPlayVideo }: Props) {
-  const [startTime, setStartTime] = useState<number>(video.starttime || 0)
-  const [duration, setDuration] = useState<number>(0)
->>>>>>> d2bd5a5736a06c310529b5b73157898bbbc4fcaa
 
   const removeFromPlaylist = (video: Video) => {
     if (playlist.videos.includes(video)) {
       setPlaylistTracks((playlistTracks) => {
         return playlistTracks.filter((track) => {
-          return track !== video
-        })
-      })
+          return track !== video;
+        });
+      });
     }
-<<<<<<< HEAD
     if (playlist.videos.length === 0 && isEdit) {
       deleteLocalStorage("newPlaylist");
     }
@@ -79,25 +60,11 @@ export default function Playlisttrack({ playlist, video, setPlaylistTracks, setP
       return { hours: hrs, minutes: mins, seconds: secs };
     }
   };
-=======
-  }
-
-  const updateTime = () => {
-    setPlaylistTracks((previousTracks) =>
-      previousTracks.map((track) => (video.id === track.id ? { ...track, starttime: startTime } : track))
-    )
-  }
-
-  const convertToDisplayTime = (time: number) => {
-    return new Date(time * 1000).toISOString().substr(11, 8)
-  }
->>>>>>> d2bd5a5736a06c310529b5b73157898bbbc4fcaa
 
   const playNow = (video: YoutubeResponseVideo | Video) => {
-    setPlayVideo(video)
-  }
+    setPlayVideo(video);
+  };
 
-<<<<<<< HEAD
   // Function to show toast
   const showToast = () => {
     toast("There needs to be at least 60 seconds!");
@@ -130,11 +97,6 @@ export default function Playlisttrack({ playlist, video, setPlaylistTracks, setP
       setStartTime(Math.min(Math.max(totalSeconds, 0), duration));
     }
   };
-=======
-  useEffect(() => {
-    video.starttime = startTime
-  }, [startTime, video])
->>>>>>> d2bd5a5736a06c310529b5b73157898bbbc4fcaa
 
   useEffect(() => {
     setDisplayedTime(displayTime());
@@ -155,17 +117,13 @@ export default function Playlisttrack({ playlist, video, setPlaylistTracks, setP
       setStartTime(0);
     }
     if (video && video.duration) {
-      let time = isoConvert(video.duration)
+      let time = isoConvert(video.duration);
       if (time) {
-        let newDuration: number = convertToSeconds(time)
-        setDuration(newDuration)
+        let newDuration: number = convertToSeconds(time);
+        setDuration(newDuration);
       }
     }
-<<<<<<< HEAD
   }, [video]);
-=======
-  }, [])
->>>>>>> d2bd5a5736a06c310529b5b73157898bbbc4fcaa
 
   return (
     <div
@@ -176,8 +134,8 @@ export default function Playlisttrack({ playlist, video, setPlaylistTracks, setP
         <h1
           className="h-6 truncate pr-4 hover:cursor-pointer underline hover:text-red-500"
           onClick={(event: React.MouseEvent<HTMLElement>) => {
-            if ((event.target as HTMLInputElement).tagName !== 'BUTTON') {
-              playNow(video)
+            if ((event.target as HTMLInputElement).tagName !== "BUTTON") {
+              playNow(video);
             }
           }}
         >
@@ -186,7 +144,7 @@ export default function Playlisttrack({ playlist, video, setPlaylistTracks, setP
         <div
           className="hover:cursor-pointer"
           onClick={(event: React.MouseEvent<HTMLElement>) => {
-            removeFromPlaylist(video)
+            removeFromPlaylist(video);
           }}
         >
           <svg
@@ -210,10 +168,9 @@ export default function Playlisttrack({ playlist, video, setPlaylistTracks, setP
             className="text-sm text-gray-500"
             // onClick={(event: React.MouseEvent<HTMLElement>) => updateTime()}
           >
-            {' '}
-            Start time:{' '}
+            {" "}
+            Start time:{" "}
           </label>
-<<<<<<< HEAD
           <div className="sliderContainer">
             <input
               type="range"
@@ -252,46 +209,7 @@ export default function Playlisttrack({ playlist, video, setPlaylistTracks, setP
             />
           </div>
         )}
-=======
-          <input
-            className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
-            type="range"
-            min="0"
-            max={duration.toString()}
-            name="duration"
-            id={video.id + '_duration'}
-            value={startTime}
-            onChange={(e) => {
-              setStartTime(parseInt(e.target.value))
-            }}
-          />
-        </div>
-        <label>
-          Time (HH:MM:SS):{' '}
-          <input
-            type="text"
-            value={convertToDisplayTime(startTime)}
-            onChange={(e) => {
-              const value = e.target.value
-              console.log(value)
-              if (/^\d{0,2}:\d{0,2}:\d{0,2}$/.test(value)) {
-                // Allow only valid HH:MM:SS formats during typing
-                console.log(parseInt(value))
-                setStartTime(parseInt(value))
-              }
-            }}
-            placeholder="00:00:00"
-            style={{ width: '100px', textAlign: 'center' }}
-          />
-        </label>
-        <output
-          className="border border-solid"
-          // onClick={(event: React.MouseEvent<HTMLElement>) => updateTime}
-        >
-          {convertToDisplayTime(startTime)}
-        </output>
->>>>>>> d2bd5a5736a06c310529b5b73157898bbbc4fcaa
       </div>
     </div>
-  )
+  );
 }

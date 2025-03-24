@@ -34,7 +34,7 @@ export default function NowPlaying({
           <h2 className="text-2xl font-semibold text-red-500 mb-4">
             Now Playing{" "}
             <span className="text-sm text-white align-bottom">
-              ({currentVideo} / {playlist.videos.length})
+              ({currentVideo + 1} / {playlist.videos.length})
             </span>
           </h2>
           <div className="flex items-center space-x-4">
