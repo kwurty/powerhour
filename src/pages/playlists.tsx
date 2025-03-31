@@ -8,7 +8,7 @@ export default function Playlists() {
   const image = "https://picsum.photos/50";
   const { user, isReady } = useUser();
   const [page, setPage] = useState<number>(1);
-  const [maxPages, setMaxPages ] = useState<number>(1);
+  const [maxPages, setMaxPages] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const fetchPlaylists = async () => {
     let options = {};
@@ -21,11 +21,12 @@ export default function Playlists() {
       };
     }
     const searchString = encodeURIComponent(searchQuery);
+    console.log(searchString);
     const response = await fetch(
       process.env.REACT_APP_BACKEND_API_BASE_API +
         "playlists" +
         (page ? `?page=${page}` : "") +
-        (searchQuery ? `?search=${encodeURIComponent(searchString)}` : ""),
+        (searchQuery ? `&search=${searchString}` : ""),
       options
     );
     let playlistsJson = await response.json();
@@ -41,7 +42,7 @@ export default function Playlists() {
 
   return (
     <div className="p-4 ">
-      <div className="grid w-screen items-center justify-center">
+      <div className="grid w-screen items-left justify-center">
         <div className="mb-6 mx-2 flex items-center px-4 py-3 rounded-md border-2 border-red-600 overflow-hidden max-w-md font-[sans-serif]">
           <input
             type="text"
@@ -49,6 +50,11 @@ export default function Playlists() {
             className="lg:w-96 sm:w-56 outline-none bg-transparent text-gray-100 text-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                fetchPlaylists();
+              }
+            }}
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"
