@@ -228,7 +228,7 @@ export default function Play({ Playlist }: props) {
           overflow: "hidden",
         }}
       >
-        <div className="max-w-sm">
+        <div className="relative">
           <NowPlaying
             playlist={CurrentPlaylist}
             currentVideo={currentVideo}
@@ -237,6 +237,7 @@ export default function Play({ Playlist }: props) {
             handleFullscreen={handleFullscreen}
             goNext={goNext}
             togglePlayPause={togglePlayPause}
+            isFullScreen={isFullscreen}
           />
         </div>
 
@@ -255,7 +256,7 @@ export default function Play({ Playlist }: props) {
             opts={videoOptions}
             style={{
               width: "100%",
-              height: "90%",
+              height: isFullscreen ? "100%" : "90%",
             }}
             onReady={(event: { target: any }) => {
               playerRef.current = event.target; // Save the player instance

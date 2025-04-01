@@ -91,14 +91,20 @@ export default function PlaylistView({
   };
 
   const submitPlaylist = async () => {
-    if (!user) {
+    const token = localStorage.getItem("token");
+    if (!user || !token) {
       toast.error("You must be logged in to submit a playlist!");
       return;
     }
-    const token = localStorage.getItem("token");
+
     try {
-      let response = await fetch(`http://localhost:3333/playlists`, {
-        method: "POST",
+      const method = isEdit ? "PUT" : "POST";
+      const id = playlist.id;
+      const url = isEdit
+        ? `${process.env.REACT_APP_BACKEND_API_BASE_API}playlists/${id}`
+        : `${process.env.REACT_APP_BACKEND_API_BASE_API}playlists`;
+      let response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -118,7 +124,7 @@ export default function PlaylistView({
       deleteLocalStorage("newPlaylist");
       navigate(`/playlists/${playlistId}`);
     } catch (error) {
-      console.error(error);
+      toast.error("There was an error creating your playlist. Try again!");
     }
   };
 

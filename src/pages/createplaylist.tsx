@@ -7,12 +7,15 @@ import { setLocalStorage, getLocalStorage } from "../services/tools";
 import { Video, YoutubeResponseVideo } from "../types/youtubesearch.type";
 import { useParams } from "react-router-dom";
 
+import { useUser } from "../services/user";
+
 type props = {
   isEdit: boolean;
 };
 
 export default function CreatePlaylist({ isEdit }: props) {
   const { id } = useParams();
+  const { user } = useUser();
   const [playlistTracks, setPlaylistTracks] = useState<Video[]>([]);
 
   const [playVideo, setPlayVideo] = useState<YoutubeResponseVideo | Video>({
@@ -100,8 +103,6 @@ export default function CreatePlaylist({ isEdit }: props) {
     },
   });
 
-  const [unauthorized, setUnauthorized] = useState<Boolean>(false);
-
   const [currentVideoTime, setCurrentVideoTime] = useState<number>(0);
 
   const [playlist, setPlaylist] = useState<Playlist>({
@@ -152,13 +153,10 @@ export default function CreatePlaylist({ isEdit }: props) {
             process.env.REACT_APP_BACKEND_API_BASE_API + "playlists/" + id
           );
 
-          if (response.status === 401) {
-            return setUnauthorized(true);
-          }
-
           let playList = await response.json();
           if (playList) {
             setPlaylist(playList);
+            setPlaylistTracks(playList.videos);
           }
         };
         getPlaylist();
@@ -173,7 +171,14 @@ export default function CreatePlaylist({ isEdit }: props) {
     }));
   };
 
-  if (!isEdit || (isEdit && !unauthorized && playlist.id !== undefined)) {
+  if (
+    !isEdit ||
+    (isEdit &&
+      user &&
+      id &&
+      playlist.user_id === user.id &&
+      playlist.id !== undefined)
+  ) {
     return (
       <div className="grid sm:grid-cols-3 sm:grid-rows-1 lg:grid-cols-7 lg:grid-rows-1 ">
         {/* <button onClick={changeVideoHandler}> change video </button> */}
@@ -206,11 +211,30 @@ export default function CreatePlaylist({ isEdit }: props) {
         </div>
       </div>
     );
-  } else if (isEdit && !unauthorized && playlist.id === undefined) {
-    return <div>This playlist does not exist.</div>;
-  } else if (isEdit && unauthorized) {
-    return <div>You do not have permission to edit this playlist.</div>;
+  } else if (isEdit && playlist.id === undefined) {
+    return (
+      <div className="text-white w-full flex justify-center align-middle pt-5 text-lg">
+        This playlist does not exist.
+      </div>
+    );
+  } else if (isEdit && user) {
+    return (
+      <div className="text-white w-full flex justify-center align-middle pt-5 text-lg">
+        You do not have permission to edit this playlist.
+      </div>
+    );
+  } else if (!user) {
+    return (
+      <div className="text-white w-full flex justify-center align-middle pt-5 text-lg">
+        You must be logged in to edit a playlist
+      </div>
+    );
   } else {
-    return <div> Loading ... </div>;
+    return (
+      <div className="text-white w-full flex justify-center align-middle pt-5 text-lg">
+        {" "}
+        Loading ...{" "}
+      </div>
+    );
   }
 }

@@ -4,11 +4,8 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   RouterProvider,
-  Routes,
   Route,
-  Link,
 } from "react-router-dom";
-import Nav from "./components/nav";
 import Errorscreen from "./pages/errorscreen";
 import Profile from "./pages/profile";
 import Playlists from "./pages/playlists";
